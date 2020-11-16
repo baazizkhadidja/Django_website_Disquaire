@@ -1,0 +1,9 @@
+
+
+<h1>Liste des albums</h1>
+{% for album in albums %}
+    <h2>{{ album.nom }}</h2>
+    {% if album.photo %}
+    <img width="100%" height="225"  src="{{ album.photo.url}}"/>
+    {% endif %}
+{% endfor %}
