@@ -29,6 +29,34 @@ def listing(request):
 def detail(request, album_id):
     album = get_object_or_404(Album, pk= album_id)
     artists_name = " ".join([artist.name for artist in album.artists.all()])
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        name = request.POST.get('name')
+
+        contact = Contact.objects.filter(email=email)
+        if not contact.exists():
+            # If a contact is not registered, create a new one.
+            contact = Contact.objects.create(
+                email=email,
+                name=name
+            )
+        else:
+            contact = contact.first()
+        # If no album matches the id, it means the form must have been tweaked
+        # so returning a 404 is the best solution.
+        album = get_object_or_404(Album, id=album_id)
+        booking = Booking.objects.create(
+            contact=contact,
+            album=album
+        )
+
+        # Make sure no one can book the album again.
+        album.available = False
+        album.save()
+        context = {
+            'album_title': album.title
+        }
+        return render(request, 'store/merci.html', context)
     context = {
         'album_title': album.title,
         'artists_name': artists_name,
