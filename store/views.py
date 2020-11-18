@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django import forms
 from .models import Album, Artist, Contact, Booking
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from .forms import ContactForm
+from .forms import ContactForm, ParagraphErrorList
 
 def index(request):
     albums = Album.objects.filter(available = True).order_by('-created_at')[:12]
@@ -38,7 +38,7 @@ def detail(request, album_id):
     }
 
     if request.method == 'POST':
-        form = ContactForm(request.POST)
+        form = ContactForm(request.POST, error_class=ParagraphErrorList)
         if form.is_valid():
 
             email = form.cleaned_data['email']
