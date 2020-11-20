@@ -46,8 +46,8 @@ class Booking(models.Model):
     contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
     album = models.OneToOneField(Album, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.contact
+   # def __str__(self):
+     #   return self.contact
 
     class Meta:
         verbose_name = "réservation"
