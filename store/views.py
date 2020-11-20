@@ -3,6 +3,7 @@ from django import forms
 from .models import Album, Artist, Contact, Booking
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from .forms import ContactForm, ParagraphErrorList
+from django.db import transaction
 
 def index(request):
     albums = Album.objects.filter(available = True).order_by('-created_at')[:12]
@@ -25,7 +26,7 @@ def listing(request):
         'paginate': True
     }
     return render(request, 'store/listing.html', context)
-
+@transaction.atomic
 def detail(request, album_id):
     album = get_object_or_404(Album, pk= album_id)
     artists_name = " ".join([artist.name for artist in album.artists.all()])
@@ -61,7 +62,7 @@ def detail(request, album_id):
                 album=album
             )
             # Make sure no one can book the album again.
-            album.available = False
+            album.available = True
             album.save()
             context = {
                 'album_title': album.title
