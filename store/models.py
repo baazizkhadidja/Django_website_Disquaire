@@ -5,7 +5,7 @@ from django.db import models
 
 
 class Artist(models.Model):
-    name = models.CharField('Nom de l artiste', max_length=200, unique = True)
+    name = models.CharField('Nom de l artiste', max_length=200, unique = False)
 
     def __str__(self):
         return self.name
@@ -42,12 +42,12 @@ class Contact(models.Model):
 
 class Booking(models.Model):
     created_at = models.DateTimeField("date d'envoie",auto_now_add=True)
-    contacted = models.BooleanField("demande trétée ?", default = False)
+    contacted = models.BooleanField("demande traitée ?", default = False)
     contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
-    album = models.OneToOneField(Album, on_delete=models.CASCADE)
+    album = models.ForeignKey(Album, on_delete=models.CASCADE)
 
-   # def __str__(self):
-     #   return self.contact
+    def __str__(self):
+        return str(self.contact)
 
     class Meta:
         verbose_name = "réservation"

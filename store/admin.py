@@ -1,17 +1,38 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
+from django.urls import reverse
+from django.contrib.contenttypes.models import ContentType
+
 from .models import Booking, Album, Artist, Contact
 # Register your models here.
-admin.site.register(Booking)
 
 
-class BookingInline(admin.TabularInline):
+
+class AdminURLMixin(object):
+
+    def get_admin_url(self, obj):
+        content_type = ContentType.objects.get_for_model(obj.__class__)
+        return reverse("admin:store_%s_change" % (
+            content_type.model),
+            args=(obj.id,))
+
+class BookingInline(admin.TabularInline, AdminURLMixin):
+    readonly_fields = ["created_at", "contacted", "album_link"]
     model = Booking
     fieldsets = [
-        (None, {'fields': ['album', 'contacted']})
+        (None, {'fields': ['album_link', 'contacted']})
     ]
     extra = 0
     verbose_name = "Réservations"
     verbose_name_plural = "Réservations"
+
+    def has_add_permission(self, request, object=None):
+        return False
+
+    def album_link(self, booking):
+        url = self.get_admin_url(booking.album)
+        return mark_safe("<a href='{}'>{}</a>".format(url, booking.album.title))
+
 
 
 class AlbumArtistInline(admin.TabularInline):
@@ -31,3 +52,29 @@ class ArtistAdmin(admin.ModelAdmin):
 @admin.register(Album)
 class AlbumAdmin(admin.ModelAdmin):
     search_fields = ['reference', 'title']
+
+
+@admin.register(Booking)
+class BookingAdmin(admin.ModelAdmin, AdminURLMixin):
+    readonly_fields = ["created_at", "contact","contact_link" , "album_link"]
+    fields = ["created_at", "album_link", "contacted"]
+    list_filter = ['created_at', 'contacted']
+
+    def has_add_permission(self, request, object=None):
+        return False
+
+    def contact_link(self, booking):
+        url = self.get_admin_url(booking.contact)
+        return mark_safe("<a href='{}'>{}</a>".format(url, booking.contact.name))
+
+
+    def album_link(self, booking):
+        url = self.get_admin_url(booking.album)
+        return mark_safe("<a href='{}'>{}</a>".format(url, booking.album.title))
+
+
+
+
+
+
+
