@@ -1,1 +1,1 @@
-web: gunicorn disquaire.wsgi
+web: gunicorn Disc.wsgi
